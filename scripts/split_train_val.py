@@ -1,7 +1,7 @@
 import pandas as pd
 import argparse
 import re
-import os 
+import os
 from sklearn.model_selection import train_test_split
 
 def options():
@@ -20,17 +20,17 @@ def main():
     for line in df_in:
         x.append(line)
         y.append(line[1])
-    
+
     x_train, x_test, y_train, y_test = train_test_split(x, y,
                                                     test_size=0.1,
                                                     random_state=0,
                                                     stratify=y)
     root_dir = os.path.split(args.input)[0]
 
-    df = pd.DataFrame(x_train, columns=["file_path", "class", "sexo", "idade", "nivel_falta_de_ar"])
+    df = pd.DataFrame(x_train, columns=["filepath","class"])
     df.to_csv(os.path.join(root_dir,'metadata_train.csv'), index=False)
 
-    df = pd.DataFrame(x_test, columns=["file_path", "class", "sexo", "idade", "nivel_falta_de_ar"])
+    df = pd.DataFrame(x_test, columns=["filepath","class"])
     df.to_csv(os.path.join(root_dir,'metadata_eval.csv'), index=False)
 
 if __name__ == '__main__':

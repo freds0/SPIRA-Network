@@ -20,17 +20,17 @@ from utils.tensorboard import TensorboardWriter
 
 from utils.dataset import train_dataloader, eval_dataloader
 
-from models.spiraconv import SpiraConvV1, SpiraConvV2
-from utils.audio_processor import AudioProcessor 
+from models.cnn import conv2d
+from utils.audio_processor import AudioProcessor
 
 def validation(criterion, ap, model, c, testloader, tensorboard, step,  cuda):
     padding_with_max_lenght = c.dataset['padding_with_max_lenght']
     model.zero_grad()
     model.eval()
-    loss = 0 
+    loss = 0
     acc = 0
     with torch.no_grad():
-        for feature, target in testloader:       
+        for feature, target in testloader:
             #try:
             if cuda:
                 feature = feature.cuda()
@@ -55,10 +55,8 @@ def validation(criterion, ap, model, c, testloader, tensorboard, step,  cuda):
 
 def train(args, log_dir, checkpoint_path, trainloader, testloader, tensorboard, c, model_name, ap, cuda=True):
     padding_with_max_lenght = c.dataset['padding_with_max_lenght']
-    if(model_name == 'spiraconv_v1'):
-        model = SpiraConvV1(c)
-    elif (model_name == 'spiraconv_v2'):
-        model = SpiraConvV2(c)
+    if(model_name == 'conv2d'):
+        model = conv2d(c)
     #elif(model_name == 'voicesplit'):
     else:
         raise Exception(" The model '"+model_name+"' is not suported")
@@ -89,7 +87,7 @@ def train(args, log_dir, checkpoint_path, trainloader, testloader, tensorboard, 
             optimizer.load_state_dict(checkpoint['optimizer'])
         except:
             print(" > Optimizer state is not loaded from checkpoint path, you see this mybe you change the optimizer")
-        
+
         step = checkpoint['step']
     else:
         print("Starting new training run")
@@ -157,7 +155,7 @@ def train(args, log_dir, checkpoint_path, trainloader, testloader, tensorboard, 
                     # run validation and save best checkpoint
                     val_loss = validation(eval_criterion, ap, model, c, testloader, tensorboard, step,  cuda=cuda)
                     best_loss = save_best_checkpoint(log_dir, model, optimizer, c, step, val_loss, best_loss)
-        
+
         print('=================================================')
         print("Epoch %d End !"%epoch)
         print('=================================================')
